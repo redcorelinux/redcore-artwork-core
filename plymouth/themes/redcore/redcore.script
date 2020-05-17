@@ -1,0 +1,89 @@
+redcore_wall = Image("background.png");
+screen_ratio = Window.GetHeight() / Window.GetWidth();
+wall_image_ratio = redcore_wall.GetHeight() / redcore_wall.GetWidth();
+
+if (screen_ratio > wall_image_ratio)
+  {  # Screen ratio is taller than image ratio, we will match the screen height
+     scale_factor =  Window.GetHeight() / redcore_wall.GetHeight();
+  }
+else
+  {  # Screen ratio is wider than image ratio, we will match the screen width
+     scale_factor =  Window.GetWidth() / redcore_wall.GetWidth();
+  }
+
+scaled_wall_image = redcore_wall.Scale(redcore_wall.GetWidth() * scale_factor, redcore_wall.GetHeight() * scale_factor);
+redcore_sprite = Sprite(scaled_wall_image); 		# Create a sprite using the scaled image
+
+redcore_sprite.SetX(Window.GetWidth()  / 2 - scaled_wall_image.GetWidth() / 2); 	# Place it in the centre
+redcore_sprite.SetY(Window.GetHeight() / 2 - scaled_wall_image.GetHeight() / 2);
+redcore_sprite.setZ(-100);
+
+#----------------------------------------- Logo -----------------------------------------
+
+logo.image = Image("redcore-logo.png");
+logo.sprite = Sprite(logo.image);
+logo.opacity_angle = 0;     				# enable this if blinking logo is also activated
+
+# Those lines will position the logo in the center, with fixed opacity
+# Disable for blinking logo
+
+#logo.sprite.SetX (Window.GetX() + Window.GetWidth()  / 2 - logo.image.GetWidth()  / 2);
+#logo.sprite.SetY (Window.GetY() + Window.GetHeight() / 2 - logo.image.GetHeight() / 2);
+
+#------------------------------------- Blinking logo ------------------------------------
+
+# Uncomment bellow, but make sure to coment the above 2 lines, for a blinking logo
+
+fun refresh_callback ()
+  {
+    if (status == "normal")
+      {
+        logo.opacity_angle += ((2 * 3.14) / 50) * 0.3;  # 0.3 HZ
+        min_opacity = 0.3;
+        opacity = (Math.Cos(logo.opacity_angle) + 1) / 2;
+        opacity *= 1 - min_opacity;
+        opacity += min_opacity;
+        logo.sprite.SetX (Window.GetX() + Window.GetWidth()  / 2 - logo.image.GetWidth()  / 2);
+        logo.sprite.SetY (Window.GetY() + Window.GetHeight() / 2 - logo.image.GetHeight() / 2);
+        logo.sprite.SetOpacity (opacity);
+      }
+    else
+      {
+       logo.sprite.SetX (0);
+       logo.sprite.SetY (0);
+       logo.sprite.SetOpacity (1);
+      }
+  }
+  
+ Plymouth.SetRefreshFunction (refresh_callback);
+ status = "normal";
+
+#--------------------------------------- Progress Bar ----------------------------------
+
+progress_bar.original_image = Image("progress_bar.png");
+progress_bar.sprite = Sprite();
+
+progress_bar.x = Window.GetX() + Window.GetWidth()  / 2 - progress_bar.original_image.GetWidth() / 2;
+progress_bar.y = Window.GetY() + Window.GetHeight() / 2 * 1.5; # Place it at 3/4 from top
+progress_bar.sprite.SetPosition(progress_bar.x, progress_bar.y, 1);
+progress_bar.sprite.SetOpacity (0.35);
+ 
+fun progress_callback (duration, progress)
+  {
+    if (progress_bar.image.GetWidth () != Math.Int (progress_bar.original_image.GetWidth () * progress))
+      {
+        progress_bar.image = progress_bar.original_image.Scale(progress_bar.original_image.GetWidth(progress_bar.original_image) * progress, progress_bar.original_image.GetHeight());
+        progress_bar.sprite.SetImage (progress_bar.image);
+      }
+  }
+
+Plymouth.SetBootProgressFunction(progress_callback);
+
+#----------------------------------------- Quit ----------------------------------------
+
+fun quit_callback ()
+{
+  logo.sprite.SetOpacity (1);
+}
+
+Plymouth.SetQuitFunction(quit_callback);

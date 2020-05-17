@@ -1,0 +1,11 @@
+[Plymouth Theme]
+Name=Redcore
+Description=Redcore Linux plymouth theme
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/redcore
+ScriptFile=/usr/share/plymouth/themes/redcore/redcore.script
+
+[script-env-vars]
+example_env_var=example env var value
